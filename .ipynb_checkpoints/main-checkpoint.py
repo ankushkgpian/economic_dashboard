@@ -6,7 +6,7 @@ from modules.data_loader import load_data
 
 # --- Streamlit Config ---
 st.set_page_config(layout="wide", page_title="Economic Dashboard", page_icon="📊")
-st.title("📊 Economic Indicator Analysis Dashboard")
+st.title("Economic Indicator Analysis Dashboard")
 
 # --- Sidebar Inputs ---
 config = configure_sidebar()

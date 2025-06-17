@@ -35,7 +35,7 @@ def configure_sidebar():
         }
 
 def display_tabs(config, df_target, df_softs):
-    tabs = st.tabs(["📈 Time Series", "📅 Seasonality", "📊 Forecasting", "📥 Export", "🔗 Correlation"])
+    tabs = st.tabs(["Time Series", "Seasonality", "Forecasting", "Correlation Matrix"])
 
     with tabs[0]:
         st.subheader("Actual vs Forecast")
@@ -50,10 +50,6 @@ def display_tabs(config, df_target, df_softs):
         run_forecast_model(df_target, df_softs, config)
 
     with tabs[3]:
-        st.subheader("Download Data")
-        download_options(df_target, config["target_file"])
-
-    with tabs[4]:
         st.subheader("Correlation Matrix")
         compute_correlation_matrix(df_target, df_softs)
 
