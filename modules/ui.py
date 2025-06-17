@@ -5,6 +5,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from modules.modeling import run_forecast_model, compute_correlation_matrix
+def clean_title(name):
+    return name.replace(".csv", "").replace("_", " ").title()
 
 def configure_sidebar():
     with st.sidebar:
