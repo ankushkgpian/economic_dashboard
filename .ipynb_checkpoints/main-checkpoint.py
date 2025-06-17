@@ -17,15 +17,18 @@ df_target, df_softs = load_data(config)
 # --- UI Tabs ---
 display_tabs(config, df_target, df_softs)
 
+# --- Footer ---
 st.markdown("""
     <hr style="margin-top: 50px;">
     <div style='text-align: center; padding: 10px; font-size: 0.9em; color: grey;'>
-        Made with ❤️ by Ankush Kumar &nbsp;|&nbsp;
+        Made with ❤️ by Ankush Kumar<br>
+        <span style='font-size: 0.8em;'>Indian Institute of Technology Kharagpur</span><br>
         <a href='https://github.com/ankushkgpian' target='_blank'>GitHub</a> &nbsp;|&nbsp;
         <a href='https://www.linkedin.com/in/ankushkgpian/' target='_blank'>LinkedIn</a>
     </div>
 """, unsafe_allow_html=True)
 
+# --- Custom Styling ---
 st.markdown("""
     <style>
     body {

@@ -35,11 +35,13 @@ def configure_sidebar():
         }
 
 def display_tabs(config, df_target, df_softs):
-    tabs = st.tabs(["Time Series", "Seasonality", "Forecasting", "Correlation Matrix"])
+    clean_name = lambda x: x.replace(".csv", "").replace("_", " ").title()
+
+    tabs = st.tabs(["Time Series", "Seasonality", "Forecasting", "Correlation"])
 
     with tabs[0]:
-        st.subheader("Actual vs Forecast")
-        plot_actual_vs_forecast(df_target, config["target_file"])
+        st.subheader(f"Actual vs Forecast - {clean_name(config['target_file'])}")
+        plot_actual_vs_forecast(df_target)
 
     with tabs[1]:
         st.subheader("Surprise Seasonality")
@@ -52,6 +54,29 @@ def display_tabs(config, df_target, df_softs):
     with tabs[3]:
         st.subheader("Correlation Matrix")
         compute_correlation_matrix(df_target, df_softs)
+
+    st.markdown("""
+        <style>
+            .block-container {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            .stTabs [data-baseweb="tab"] {
+                font-size: 16px;
+                font-weight: 600;
+                padding: 8px 24px;
+            }
+            h2, h3 {
+                color: #0B5394;
+            }
+            .stButton>button {
+                background-color: #0B5394;
+                color: white;
+                font-weight: 600;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
 
 def plot_actual_vs_forecast(df, title):
     fig = go.Figure()
