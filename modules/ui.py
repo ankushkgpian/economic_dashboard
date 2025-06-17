@@ -13,36 +13,33 @@ import streamlit as st
 
 def configure_sidebar():
     with st.sidebar:
-        st.markdown("## ⚙️ Configuration Panel")
+        st.markdown("## Configuration Panel")
 
         # --- Market Selection ---
-        with st.expander("📍 Market Selection", expanded=True):
+        with st.expander("Market Selection", expanded=True):
             countries = ["US", "UK", "EZ", "CA", "Aussie"]
-            country = st.selectbox("🌐 Select Market", countries, help="Choose the country or region for analysis")
+            country = st.selectbox("Select Market", countries, help="Choose the country or region for analysis")
 
         # --- Load Files ---
         folder = os.path.join(".", country)
         files = [f for f in os.listdir(folder) if f.endswith(".csv")]
         if not files:
-            st.error("⚠️ No data files found in the selected folder.")
+            st.error("No data files found in the selected folder.")
             st.stop()
 
         # --- Indicator Selection ---
-        with st.expander("📊 Indicator Selection", expanded=True):
-            search_term = st.text_input("🔍 Filter Indicators", help="Type to filter available indicators")
-            filtered_files = [f for f in files if search_term.lower() in f.lower()] if search_term else files
-
-            target_file = st.selectbox("🎯 Target Indicator", filtered_files, help="This is the variable you're trying to predict")
-            soft_files = st.multiselect("📎 Soft Indicators", [f for f in filtered_files if f != target_file], help="Indicators used to explain or predict the target")
+        with st.expander("Indicator Selection", expanded=True):
+            target_file = st.selectbox("Target Indicator", files, help="This is the variable you're trying to predict")
+            soft_files = st.multiselect("Soft Indicators", [f for f in files if f != target_file], help="Indicators used to explain or predict the target")
 
         # --- Time Filter ---
-        with st.expander("🕒 Time Range Filter", expanded=True):
-            year_range = st.slider("📅 Select Year Range", 2005, 2025, (2010, 2020), help="Limit the data to this year range")
+        with st.expander("Time Range Filter", expanded=True):
+            year_range = st.slider("Select Year Range", 2005, 2025, (2010, 2020), help="Limit the data to this year range")
 
         # --- Optional Advanced Options ---
-        with st.expander("🛠️ Advanced Options (optional)", expanded=False):
-            normalize = st.checkbox("📐 Normalize Indicators", value=True, help="Apply standard scaling to soft indicators")
-            lag_period = st.slider("⏪ Lag Period", 0, 12, 3, help="Use lagged values of indicators (months)")
+        with st.expander("Advanced Options (optional)", expanded=False):
+            normalize = st.checkbox("Normalize Indicators", value=True, help="Apply standard scaling to soft indicators")
+            lag_period = st.slider("Lag Period", 0, 12, 3, help="Use lagged values of indicators (months)")
 
         return {
             "country": country,
