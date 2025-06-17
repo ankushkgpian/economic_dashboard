@@ -25,3 +25,22 @@ st.markdown("""
         <a href='https://www.linkedin.com/in/ankushkgpian/' target='_blank'>LinkedIn</a>
     </div>
 """, unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
+    body {
+        background-color: #F9F9F9;
+        color: #333333;
+    }
+    .css-1d391kg, .css-ffhzg2 {
+        font-family: 'Segoe UI', sans-serif;
+    }
+    h1, h2, h3, h4 {
+        color: #0B5394;
+    }
+    .stButton>button {
+        background-color: #0B5394;
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
