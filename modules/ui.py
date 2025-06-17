@@ -43,7 +43,7 @@ def display_tabs(config, df_target, df_softs):
 
     with tabs[0]:
         st.subheader(f"Actual vs Forecast - {clean_name(config['target_file'])}")
-        plot_actual_vs_forecast(df_target)
+        plot_actual_vs_forecast(df_target, config["target_file"])
 
     with tabs[1]:
         st.subheader("Surprise Seasonality")
