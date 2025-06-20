@@ -75,7 +75,6 @@ def run_forecast_model(df_target, df_softs, config):
     st.plotly_chart(fig, use_container_width=True)
 
 
-
 def compute_correlation_matrix(df_target, df_softs):
     if not df_softs:
         st.warning("Select soft indicators.")
