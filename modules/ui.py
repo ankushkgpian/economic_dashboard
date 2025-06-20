@@ -84,7 +84,7 @@ def display_tabs(config, df_target, df_softs):
 
     with tabs[3]:
         st.subheader("Correlation Matrix")
-        compute_correlation_matrix(df_target, df_softs)
+        compute_correlation_matrix(df_target, df_softs, config)
 
     with tabs[4]:
         st.subheader("Intermarket Lead-Lag Correlation")
