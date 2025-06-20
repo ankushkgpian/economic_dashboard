@@ -31,19 +31,61 @@ st.markdown("""
 # --- Custom Styling ---
 st.markdown("""
     <style>
-    body {
-        background-color: #F9F9F9;
-        color: #333333;
-    }
-    .css-1d391kg, .css-ffhzg2 {
-        font-family: 'Segoe UI', sans-serif;
-    }
-    h1, h2, h3, h4 {
-        color: #0B5394;
-    }
-    .stButton>button {
-        background-color: #0B5394;
-        color: white;
-    }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'Montserrat', sans-serif !important;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0B5394;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #0B5394;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #0B5394;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0B5394;
+        }
+
+        p, .stMarkdown, .stDataFrame, .stTable {
+            font-size: 1rem;
+        }
+
+        .stButton>button {
+            background-color: #0B5394;
+            color: white;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+
+        .stTabs [data-baseweb="tab"] {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 24px;
+            font-family: 'Montserrat', sans-serif !important;
+        }
+
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .stSidebar, label, .stSelectbox, .stMultiSelect, .stSlider {
+            font-size: 0.95rem;
+        }
     </style>
 """, unsafe_allow_html=True)
