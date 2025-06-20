@@ -70,7 +70,7 @@ def run_forecast_model(df_target, df_softs, config):
     y_pred = model.predict(X)
 
     # --- Model Metrics ---
-    st.markdown("#### 📊 Model Metrics")
+    st.markdown("Model Metrics")
     st.table(pd.DataFrame({
         "Metric": ["R²", "MAE", "RMSE"],
         "Value": [round(r2_score(y, y_pred), 4),
@@ -95,7 +95,7 @@ def run_forecast_model(df_target, df_softs, config):
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Feature Mapping Table ---
-    st.markdown("#### 🔍 Feature Name Mapping")
+    st.markdown("Feature Name Mapping")
     mapping_df = pd.DataFrame({
         "Feature Name": feature_names,
         "Base Indicator": [name.split("_")[0] for name in feature_names],
