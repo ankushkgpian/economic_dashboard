@@ -17,19 +17,22 @@ def run_forecast_model(df_target, df_softs, config):
     # Merge target
     df = df_target[["Reference Period", "Actual"]].rename(columns={"Actual": "Target"})
 
-    # Use soft indicator names from config
-    soft_names = [src["file"].replace(".csv", "") for src in config["soft_sources"]]
+    # Track column names actually added
+    merged_soft_names = []
 
-    # Merge all soft indicators
-    for name, soft_df in zip(soft_names, df_softs):
+    for i, soft_df in enumerate(df_softs):
+        name = config["soft_sources"][i]["file"].replace(".csv", "")
+        soft_col = f"{name}"
+        merged_soft_names.append(soft_col)
+
         df = df.merge(
-            soft_df[["Reference Period", "Actual"]].rename(columns={"Actual": name}),
+            soft_df[["Reference Period", "Actual"]].rename(columns={"Actual": soft_col}),
             on="Reference Period", how="inner"
         )
 
     # Sort and create lag & diff features
     df.sort_values("Reference Period", inplace=True)
-    for col in soft_names:
+    for col in merged_soft_names:
         df[f"{col}_lag1"] = df[col].shift(config["lag_period"])
         df[f"{col}_diff1"] = df[col].diff()
 
@@ -39,12 +42,10 @@ def run_forecast_model(df_target, df_softs, config):
     X = df.drop(columns=["Reference Period", "Target"])
     y = df["Target"]
 
-    # Optional normalization
     if config.get("normalize", True):
         scaler = StandardScaler()
         X = scaler.fit_transform(X)
 
-    # Model
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X, y)
     y_pred = model.predict(X)
@@ -72,6 +73,7 @@ def run_forecast_model(df_target, df_softs, config):
 
     fig = px.bar(importances_df, x="Importance", y="Feature", orientation="h", title="Top 10 Feature Importances")
     st.plotly_chart(fig, use_container_width=True)
+
 
 
 def compute_correlation_matrix(df_target, df_softs):
