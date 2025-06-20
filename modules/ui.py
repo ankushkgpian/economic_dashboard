@@ -13,7 +13,7 @@ import streamlit as st
 
 def configure_sidebar():
     with st.sidebar:
-        st.markdown("##Configuration Panel")
+        st.markdown("Configuration Panel")
 
         countries = ["US", "UK", "EZ", "CA", "Aussie"]
         country_folders = {c: os.path.join(".", c) for c in countries}
@@ -25,7 +25,7 @@ def configure_sidebar():
             target_file = st.selectbox("Select Target Indicator", target_files)
 
         # --- Soft Indicators ---
-        with st.expander("📎 Soft Indicators", expanded=True):
+        with st.expander("Soft Indicators", expanded=True):
             soft_sources = []
             for i in range(3):  # Allow selection from up to 3 markets
                 soft_country = st.selectbox(f"Select Market {i+1} for Soft Indicator", countries, key=f"soft_country_{i}")
