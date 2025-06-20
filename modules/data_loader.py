@@ -11,12 +11,18 @@ def load_csv(filepath):
     return df
 
 def load_data(config):
-    df_target = load_csv(os.path.join(config["folder"], config["target_file"]))
-    df_softs = [load_csv(os.path.join(config["folder"], f)) for f in config["soft_files"]]
-
-    start_year, end_year = config["year_range"]
-    df_target = df_target[df_target["Reference Period"].dt.year.between(start_year, end_year)]
-    for i in range(len(df_softs)):
-        df_softs[i] = df_softs[i][df_softs[i]["Reference Period"].dt.year.between(start_year, end_year)]
+    # Load target
+    target_path = os.path.join(".", config["target_country"], config["target_file"])
+    df_target = pd.read_csv(target_path, parse_dates=["Reference Period", "Release Date"])
+    df_target["Surprise"] = df_target["Actual"] - df_target["Median_Forecast"]
+    
+    # Load soft indicators
+    df_softs = []
+    for entry in config["soft_indicators"]:
+        path = os.path.join(".", entry["country"], entry["file"])
+        df = pd.read_csv(path, parse_dates=["Reference Period", "Release Date"])
+        df["Name"] = f"{entry['country']}_{entry['file'].replace('.csv', '')}"  # Labeling for clarity
+        df_softs.append(df)
 
     return df_target, df_softs
+
