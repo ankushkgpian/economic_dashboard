@@ -105,27 +105,73 @@ def display_tabs(config, df_target, df_softs):
         lag_q = st.slider("Lag (quarters)", 0, 8, 3)
         compute_lead_lag_correlation(df1, df2, lag_quarters=lag_q)
 
-    st.markdown("""
-        <style>
-            .block-container {
-                padding-top: 2rem;
-                padding-bottom: 2rem;
-            }
-            .stTabs [data-baseweb="tab"] {
-                font-size: 16px;
-                font-weight: 600;
-                padding: 8px 24px;
-            }
-            h2, h3 {
-                color: #0B5394;
-            }
-            .stButton>button {
-                background-color: #0B5394;
-                color: white;
-                font-weight: 600;
-            }
-        </style>
-    """, unsafe_allow_html=True)
+        st.markdown("""
+            <style>
+                /* Import Montserrat font from Google Fonts */
+                @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+    
+                html, body, [class*="css"] {
+                    font-family: 'Montserrat', sans-serif;
+                    color: #333333;
+                }
+    
+                h1 {
+                    font-size: 2.2rem;
+                    font-weight: 700;
+                    color: #0B5394;
+                }
+    
+                h2 {
+                    font-size: 1.75rem;
+                    font-weight: 600;
+                    color: #0B5394;
+                }
+    
+                h3 {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    color: #0B5394;
+                }
+    
+                h4 {
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    color: #0B5394;
+                }
+    
+                .stMarkdown, .stDataFrame, .stTable {
+                    font-size: 1rem;
+                }
+    
+                .stButton>button {
+                    background-color: #0B5394;
+                    color: white;
+                    font-weight: 600;
+                    border-radius: 5px;
+                }
+    
+                .stTabs [data-baseweb="tab"] {
+                    font-size: 16px;
+                    font-weight: 600;
+                    padding: 10px 24px;
+                    font-family: 'Montserrat', sans-serif;
+                }
+    
+                .block-container {
+                    padding-top: 2rem;
+                    padding-bottom: 2rem;
+                }
+    
+                label, .stSelectbox, .stMultiSelect, .stSlider {
+                    font-size: 0.95rem;
+                }
+    
+                .stSidebar {
+                    font-size: 0.95rem;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
 
 
 def plot_actual_vs_forecast(df, title):
