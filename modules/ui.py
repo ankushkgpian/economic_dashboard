@@ -13,13 +13,13 @@ import streamlit as st
 
 def configure_sidebar():
     with st.sidebar:
-        st.markdown("## 📊 Configuration Panel")
+        st.markdown("##Configuration Panel")
 
         countries = ["US", "UK", "EZ", "CA", "Aussie"]
         country_folders = {c: os.path.join(".", c) for c in countries}
 
         # --- Target Indicator ---
-        with st.expander("🎯 Target Indicator", expanded=True):
+        with st.expander("Target Indicator", expanded=True):
             target_country = st.selectbox("Select Target Market", countries, key="target_country")
             target_files = [f for f in os.listdir(country_folders[target_country]) if f.endswith(".csv")]
             target_file = st.selectbox("Select Target Indicator", target_files)
@@ -34,11 +34,11 @@ def configure_sidebar():
                 soft_sources.append({"country": soft_country, "file": soft_file})
 
         # --- Time Filter ---
-        with st.expander("🕒 Time Range Filter", expanded=True):
-            year_range = st.slider("📅 Select Year Range", 2005, 2025, (2010, 2020))
+        with st.expander("Time Range Filter", expanded=True):
+            year_range = st.slider("Select Year Range", 2005, 2025, (2010, 2020))
 
         # --- Advanced Options ---
-        with st.expander("🛠️ Advanced Options", expanded=False):
+        with st.expander("Advanced Options", expanded=False):
             normalize = st.checkbox("Normalize Soft Indicators", value=True)
             lag_period = st.slider("Lag Period", 0, 12, 3)
 
