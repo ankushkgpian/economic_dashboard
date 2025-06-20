@@ -38,7 +38,7 @@ def run_forecast_model(df_target, df_softs, config):
     y_pred = model.predict(X_scaled)
 
     # --- Metrics ---
-    st.markdown("#### 📊 Model Metrics")
+    st.markdown("#### Model Metrics")
     st.table(pd.DataFrame({
         "Metric": ["R²", "MAE", "RMSE"],
         "Value": [round(r2_score(y, y_pred), 4),
