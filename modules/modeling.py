@@ -16,11 +16,10 @@ def run_forecast_model(df_target, df_softs, config):
 
     # Base dataframe with target
     df = df_target[["Reference Period", "Actual"]].rename(columns={"Actual": "Target"})
-
     feature_columns = []
 
     for i, soft_df in enumerate(df_softs):
-        # Use file name or fallback to Soft_1, Soft_2...
+        # Try to extract file name from config
         try:
             name = config["soft_sources"][i]["file"].replace(".csv", "")
         except Exception:
@@ -39,29 +38,39 @@ def run_forecast_model(df_target, df_softs, config):
     # Create lag and diff features
     lag_period = config.get("lag_period", 1)
     df.sort_values("Reference Period", inplace=True)
+    full_feature_names = []
 
     for col in feature_columns:
         if col in df.columns:
-            df[f"{col}_lag1"] = df[col].shift(lag_period)
-            df[f"{col}_diff1"] = df[col].diff()
+            lag_name = f"{col}_lag1"
+            diff_name = f"{col}_diff1"
+            df[lag_name] = df[col].shift(lag_period)
+            df[diff_name] = df[col].diff()
+            full_feature_names.extend([lag_name, diff_name])
         else:
             st.warning(f"Column `{col}` not found in merged data. Skipping lag/diff creation.")
 
     df.dropna(inplace=True)
 
-    X = df.drop(columns=["Reference Period", "Target"])
+    # Define X and y
+    X = df[full_feature_names]
     y = df["Target"]
 
+    # Save column names before scaling
+    feature_names = X.columns.tolist()
+
+    # Normalize if selected
     if config.get("normalize", True):
         scaler = StandardScaler()
         X = scaler.fit_transform(X)
 
+    # Train model
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X, y)
     y_pred = model.predict(X)
 
-    # --- Metrics ---
-    st.markdown("#### Model Metrics")
+    # --- Model Metrics ---
+    st.markdown("#### 📊 Model Metrics")
     st.table(pd.DataFrame({
         "Metric": ["R²", "MAE", "RMSE"],
         "Value": [round(r2_score(y, y_pred), 4),
@@ -73,25 +82,27 @@ def run_forecast_model(df_target, df_softs, config):
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df["Reference Period"], y=y, name="Actual"))
     fig.add_trace(go.Scatter(x=df["Reference Period"], y=y_pred, name="Predicted"))
+    fig.update_layout(title="Actual vs Predicted", template="plotly_white")
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Feature Importances ---
     importances_df = pd.DataFrame({
-        "Feature": X.columns,
+        "Feature": feature_names,
         "Importance": model.feature_importances_
     }).sort_values("Importance", ascending=False).head(10)
 
     fig = px.bar(importances_df, x="Importance", y="Feature", orientation="h", title="Top 10 Feature Importances")
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Show mapping of feature names to indicators ---
-    st.markdown("Feature Name Mapping")
-    feature_mapping = pd.DataFrame({
-        "Feature Name": X.columns,
-        "Original Indicator": [col.split("_")[0] for col in X.columns]  # extract base name before _lag1/_diff1
-    }).drop_duplicates().reset_index(drop=True)
+    # --- Feature Mapping Table ---
+    st.markdown("#### 🔍 Feature Name Mapping")
+    mapping_df = pd.DataFrame({
+        "Feature Name": feature_names,
+        "Base Indicator": [name.split("_")[0] for name in feature_names],
+        "Transformation": [name.split("_")[1] if "_" in name else "" for name in feature_names]
+    })
 
-    st.dataframe(feature_mapping, use_container_width=True)
+    st.dataframe(mapping_df, use_container_width=True)
 
 
 def compute_correlation_matrix(df_target, df_softs):
