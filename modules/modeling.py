@@ -100,7 +100,10 @@ def compute_correlation_matrix(df_target, df_softs):
         return
 
     df_corr = df_target[["Reference Period", "Actual"]].rename(columns={"Actual": "Target"})
-    for soft_df, name in zip(df_softs, [f"Soft_{i+1}" for i in range(len(df_softs))]):
+    soft_names = []
+    for soft_df, path in zip(df_softs, config["soft_files"]):
+        name = path.split("/")[-1].replace(".csv", "")
+        soft_names.append(name)
         df_corr = df_corr.merge(soft_df[["Reference Period", "Actual"]].rename(columns={"Actual": name}),
                                 on="Reference Period", how="inner")
 
@@ -108,6 +111,15 @@ def compute_correlation_matrix(df_target, df_softs):
     fig = px.imshow(corr, text_auto=True, color_continuous_scale="RdBu", aspect="auto")
     fig.update_layout(height=800, width=1200, template="plotly_white")
     st.plotly_chart(fig, use_container_width=True)
+
+    # --- Show indicator names mapping ---
+    st.markdown("##### 🧾 Indicator Abbreviations")
+    mapping_df = pd.DataFrame({
+        "Variable": ["Target"] + soft_names,
+        "Source File": [config["target_file"].replace(".csv", "")] + [f.split('/')[-1].replace(".csv", "") for f in config["soft_files"]]
+    })
+    st.dataframe(mapping_df, use_container_width=True)
+
 
 def compute_lead_lag_correlation(indicator1_df, indicator2_df, lag_quarters=3):
     # Merge two time series on Reference Period
