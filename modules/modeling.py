@@ -14,31 +14,41 @@ def run_forecast_model(df_target, df_softs, config):
         st.warning("Select at least one soft indicator.")
         return
 
-    # Merge target
+    # Base dataframe with target
     df = df_target[["Reference Period", "Actual"]].rename(columns={"Actual": "Target"})
 
-    # Track column names actually added
-    merged_soft_names = []
+    feature_columns = []
 
     for i, soft_df in enumerate(df_softs):
-        name = config["soft_sources"][i]["file"].replace(".csv", "")
-        soft_col = f"{name}"
-        merged_soft_names.append(soft_col)
+        # Use file name or fallback to Soft_1, Soft_2...
+        try:
+            name = config["soft_sources"][i]["file"].replace(".csv", "")
+        except Exception:
+            name = f"Soft_{i+1}"
 
+        # Rename and merge
+        soft_col = name
         df = df.merge(
             soft_df[["Reference Period", "Actual"]].rename(columns={"Actual": soft_col}),
-            on="Reference Period", how="inner"
+            on="Reference Period",
+            how="inner"
         )
 
-    # Sort and create lag & diff features
+        feature_columns.append(soft_col)
+
+    # Create lag and diff features
+    lag_period = config.get("lag_period", 1)
     df.sort_values("Reference Period", inplace=True)
-    for col in merged_soft_names:
-        df[f"{col}_lag1"] = df[col].shift(config["lag_period"])
-        df[f"{col}_diff1"] = df[col].diff()
+
+    for col in feature_columns:
+        if col in df.columns:
+            df[f"{col}_lag1"] = df[col].shift(lag_period)
+            df[f"{col}_diff1"] = df[col].diff()
+        else:
+            st.warning(f"Column `{col}` not found in merged data. Skipping lag/diff creation.")
 
     df.dropna(inplace=True)
 
-    # Features and Target
     X = df.drop(columns=["Reference Period", "Target"])
     y = df["Target"]
 
@@ -59,7 +69,7 @@ def run_forecast_model(df_target, df_softs, config):
                   round(np.sqrt(mean_squared_error(y, y_pred)), 4)]
     }))
 
-    # --- Actual vs Predicted ---
+    # --- Actual vs Predicted Plot ---
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df["Reference Period"], y=y, name="Actual"))
     fig.add_trace(go.Scatter(x=df["Reference Period"], y=y_pred, name="Predicted"))
@@ -73,7 +83,6 @@ def run_forecast_model(df_target, df_softs, config):
 
     fig = px.bar(importances_df, x="Importance", y="Feature", orientation="h", title="Top 10 Feature Importances")
     st.plotly_chart(fig, use_container_width=True)
-
 
 def compute_correlation_matrix(df_target, df_softs):
     if not df_softs:
