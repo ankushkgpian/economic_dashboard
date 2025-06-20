@@ -13,39 +13,43 @@ import streamlit as st
 
 def configure_sidebar():
     with st.sidebar:
-        st.markdown("## Configuration Panel")
+        st.markdown("## ⚙️ Configuration Panel")
 
-        # --- Market Selection ---
-        with st.expander("Market Selection", expanded=True):
-            countries = ["US", "UK", "EZ", "CA", "Aussie"]
-            country = st.selectbox("Select Market", countries, help="Choose the country or region for analysis")
+        # --- Load countries and file mapping ---
+        countries = ["US", "UK", "EZ", "CA", "Aussie"]
+        country_file_map = {}
+        for country in countries:
+            folder = os.path.join(".", country)
+            files = [f for f in os.listdir(folder) if f.endswith(".csv")]
+            country_file_map[country] = files
 
-        # --- Load Files ---
-        folder = os.path.join(".", country)
-        files = [f for f in os.listdir(folder) if f.endswith(".csv")]
-        if not files:
-            st.error("No data files found in the selected folder.")
-            st.stop()
+        # --- Target Selection ---
+        with st.expander("🎯 Target Indicator Selection", expanded=True):
+            target_country = st.selectbox("🌍 Select Target Market", countries)
+            target_file = st.selectbox("🎯 Select Target Indicator", country_file_map[target_country])
 
-        # --- Indicator Selection ---
-        with st.expander("Indicator Selection", expanded=True):
-            target_file = st.selectbox("Target Indicator", files, help="This is the variable you're trying to predict")
-            soft_files = st.multiselect("Soft Indicators", [f for f in files if f != target_file], help="Indicators used to explain or predict the target")
+        # --- Soft Indicator Selection ---
+        with st.expander("📎 Soft Indicator Selection", expanded=True):
+            soft_indicators = []
+            for country in countries:
+                options = [f for f in country_file_map[country] if f != target_file or country != target_country]
+                selected = st.multiselect(f"📊 {country} Soft Indicators", options)
+                for file in selected:
+                    soft_indicators.append({"country": country, "file": file})
 
         # --- Time Filter ---
-        with st.expander("Time Range Filter", expanded=True):
-            year_range = st.slider("Select Year Range", 2005, 2025, (2010, 2020), help="Limit the data to this year range")
+        with st.expander("🕒 Time Filter", expanded=True):
+            year_range = st.slider("📅 Select Year Range", 2005, 2025, (2010, 2020))
 
-        # --- Optional Advanced Options ---
-        with st.expander("Advanced Options (optional)", expanded=False):
-            normalize = st.checkbox("Normalize Indicators", value=True, help="Apply standard scaling to soft indicators")
-            lag_period = st.slider("Lag Period", 0, 12, 3, help="Use lagged values of indicators (months)")
+        # --- Advanced Options ---
+        with st.expander("🛠️ Advanced Options", expanded=False):
+            normalize = st.checkbox("📐 Normalize Indicators", value=True)
+            lag_period = st.slider("⏪ Lag Period (months)", 0, 12, 3)
 
         return {
-            "country": country,
-            "folder": folder,
             "target_file": target_file,
-            "soft_files": soft_files,
+            "target_country": target_country,
+            "soft_indicators": soft_indicators,  # List of dicts: {"country": ..., "file": ...}
             "year_range": year_range,
             "normalize": normalize,
             "lag_period": lag_period
