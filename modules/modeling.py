@@ -77,12 +77,22 @@ def run_forecast_model(df_target, df_softs, config):
 
     # --- Feature Importances ---
     importances_df = pd.DataFrame({
-        "Feature": X.columns if isinstance(X, pd.DataFrame) else [f"X{i}" for i in range(X.shape[1])],
+        "Feature": X.columns,
         "Importance": model.feature_importances_
     }).sort_values("Importance", ascending=False).head(10)
 
     fig = px.bar(importances_df, x="Importance", y="Feature", orientation="h", title="Top 10 Feature Importances")
     st.plotly_chart(fig, use_container_width=True)
+
+    # --- Show mapping of feature names to indicators ---
+    st.markdown("Feature Name Mapping")
+    feature_mapping = pd.DataFrame({
+        "Feature Name": X.columns,
+        "Original Indicator": [col.split("_")[0] for col in X.columns]  # extract base name before _lag1/_diff1
+    }).drop_duplicates().reset_index(drop=True)
+
+    st.dataframe(feature_mapping, use_container_width=True)
+
 
 def compute_correlation_matrix(df_target, df_softs):
     if not df_softs:
