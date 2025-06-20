@@ -73,23 +73,23 @@ def display_tabs(config, df_target, df_softs):
         compute_correlation_matrix(df_target, df_softs)
 
     with tabs[4]:
-    st.subheader("Intermarket Lead-Lag Correlation")
+        st.subheader("Intermarket Lead-Lag Correlation")
+        
+        countries = ["US", "UK", "EZ", "CA", "Aussie"]
+        country1 = st.selectbox("Select Country for Indicator 1", countries, key="leadlag1")
+        country2 = st.selectbox("Select Country for Indicator 2", countries, key="leadlag2")
     
-    countries = ["US", "UK", "EZ", "CA", "Aussie"]
-    country1 = st.selectbox("Select Country for Indicator 1", countries, key="leadlag1")
-    country2 = st.selectbox("Select Country for Indicator 2", countries, key="leadlag2")
-
-    # Load indicator files
-    folder1 = os.path.join(".", country1)
-    folder2 = os.path.join(".", country2)
-    file1 = st.selectbox("Indicator 1", os.listdir(folder1), key="file1")
-    file2 = st.selectbox("Indicator 2", os.listdir(folder2), key="file2")
-
-    df1 = pd.read_csv(os.path.join(folder1, file1), parse_dates=["Reference Period"])
-    df2 = pd.read_csv(os.path.join(folder2, file2), parse_dates=["Reference Period"])
-
-    lag_q = st.slider("Lag (quarters)", 0, 8, 3)
-    compute_lead_lag_correlation(df1, df2, lag_quarters=lag_q)
+        # Load indicator files
+        folder1 = os.path.join(".", country1)
+        folder2 = os.path.join(".", country2)
+        file1 = st.selectbox("Indicator 1", os.listdir(folder1), key="file1")
+        file2 = st.selectbox("Indicator 2", os.listdir(folder2), key="file2")
+    
+        df1 = pd.read_csv(os.path.join(folder1, file1), parse_dates=["Reference Period"])
+        df2 = pd.read_csv(os.path.join(folder2, file2), parse_dates=["Reference Period"])
+    
+        lag_q = st.slider("Lag (quarters)", 0, 8, 3)
+        compute_lead_lag_correlation(df1, df2, lag_quarters=lag_q)
 
     st.markdown("""
         <style>
