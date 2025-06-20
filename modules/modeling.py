@@ -105,7 +105,7 @@ def run_forecast_model(df_target, df_softs, config):
     st.dataframe(mapping_df, use_container_width=True)
 
 
-def compute_correlation_matrix(df_target, df_softs):
+def compute_correlation_matrix(df_target, df_softs, config):
     if not df_softs:
         st.warning("Select soft indicators.")
         return
