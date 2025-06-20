@@ -98,3 +98,32 @@ def compute_correlation_matrix(df_target, df_softs):
     fig = px.imshow(corr, text_auto=True, color_continuous_scale="RdBu", aspect="auto")
     fig.update_layout(height=800, width=1200, template="plotly_white")
     st.plotly_chart(fig, use_container_width=True)
+
+def compute_lead_lag_correlation(indicator1_df, indicator2_df, lag_quarters=3):
+    # Merge two time series on Reference Period
+    df1 = indicator1_df[["Reference Period", "Actual"]].copy()
+    df2 = indicator2_df[["Reference Period", "Actual"]].copy()
+
+    df1.rename(columns={"Actual": "Indicator1"}, inplace=True)
+    df2.rename(columns={"Actual": "Indicator2"}, inplace=True)
+
+    # Shift Indicator1 by specified lag (quarters * 3 months if monthly data)
+    df1["Reference Period"] = df1["Reference Period"] + pd.DateOffset(months=lag_quarters * 3)
+
+    # Merge on shifted period
+    merged = pd.merge(df1, df2, on="Reference Period", how="inner")
+
+    if merged.empty:
+        st.warning("No overlapping periods after lagging.")
+        return
+
+    corr = merged["Indicator1"].corr(merged["Indicator2"])
+    st.markdown(f"### Lead-Lag Correlation: {round(corr, 3)}")
+    st.write(f"Correlation after shifting Indicator 1 by {lag_quarters} quarters.")
+
+    # Plot the two time series
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=merged["Reference Period"], y=merged["Indicator1"], name="Indicator 1 (Lagged)"))
+    fig.add_trace(go.Scatter(x=merged["Reference Period"], y=merged["Indicator2"], name="Indicator 2"))
+    fig.update_layout(title="Lead-Lag Comparison", template="plotly_white")
+    st.plotly_chart(fig, use_container_width=True)
