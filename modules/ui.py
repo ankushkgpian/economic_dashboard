@@ -12,40 +12,54 @@ import os
 import streamlit as st
 
 def configure_sidebar():
+    import os
     with st.sidebar:
         st.markdown("Configuration Panel")
 
-        countries = ["US", "UK", "EZ", "CA", "Aussie"]
-        country_folders = {c: os.path.join(".", c) for c in countries}
+        # --- Target Market Selection ---
+        with st.expander("Target Market", expanded=True):
+            countries = ["US", "UK", "EZ", "CA", "Aussie"]
+            country = st.selectbox("Select Target Market", countries)
 
-        # --- Target Indicator ---
-        with st.expander("Target Indicator", expanded=True):
-            target_country = st.selectbox("Select Target Market", countries, key="target_country")
-            target_files = [f for f in os.listdir(country_folders[target_country]) if f.endswith(".csv")]
-            target_file = st.selectbox("Select Target Indicator", target_files)
+        # --- Load Target Indicator Files ---
+        target_folder = os.path.join(".", country)
+        target_files = [f for f in os.listdir(target_folder) if f.endswith(".csv")]
+        if not target_files:
+            st.error("No target indicators found in selected market.")
+            st.stop()
+        target_file = st.selectbox("Target Indicator", target_files)
 
-        # --- Soft Indicators ---
-        with st.expander("Soft Indicators", expanded=True):
-            soft_sources = []
-            for i in range(3):  # Allow selection from up to 3 markets
-                soft_country = st.selectbox(f"Select Market {i+1} for Soft Indicator", countries, key=f"soft_country_{i}")
-                soft_files = [f for f in os.listdir(country_folders[soft_country]) if f.endswith(".csv")]
-                soft_file = st.selectbox(f"Select Soft Indicator {i+1}", soft_files, key=f"soft_file_{i}")
-                soft_sources.append({"country": soft_country, "file": soft_file})
+        # --- Soft Indicators from All Markets ---
+        with st.expander("📎 Select Soft Indicators from All Markets", expanded=True):
+            all_soft_options = {}
+            for m in countries:
+                folder = os.path.join(".", m)
+                try:
+                    files = [f for f in os.listdir(folder) if f.endswith(".csv")]
+                    options = [f"{m}/{f}" for f in files if f != target_file or m != country]
+                    if options:
+                        selected = st.multiselect(f"{m} Soft Indicators", options, default=[], key=m)
+                        all_soft_options[m] = selected
+                except FileNotFoundError:
+                    continue
+
+            # Flatten selections
+            soft_files = [item for sublist in all_soft_options.values() for item in sublist]
 
         # --- Time Filter ---
-        with st.expander("Time Range Filter", expanded=True):
+        with st.expander("🕒 Time Range Filter", expanded=True):
             year_range = st.slider("Select Year Range", 2005, 2025, (2010, 2020))
 
         # --- Advanced Options ---
-        with st.expander("Advanced Options", expanded=False):
-            normalize = st.checkbox("Normalize Soft Indicators", value=True)
+        with st.expander("🛠Advanced Options", expanded=False):
+            normalize = st.checkbox("Normalize Indicators", value=True)
             lag_period = st.slider("Lag Period", 0, 12, 3)
 
         return {
-            "target_country": target_country,
+            "country": country,
+            "folder": target_folder,
             "target_file": target_file,
-            "soft_sources": soft_sources,
+            "soft_files": soft_files,
             "year_range": year_range,
             "normalize": normalize,
             "lag_period": lag_period
