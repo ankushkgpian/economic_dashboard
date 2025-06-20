@@ -14,7 +14,7 @@ import streamlit as st
 def configure_sidebar():
     import os
     with st.sidebar:
-        st.markdown("Configuration Panel")
+        st.subheader("Configuration Panel")
 
         # --- Target Market Selection ---
         with st.expander("Target Market", expanded=True):
@@ -30,7 +30,7 @@ def configure_sidebar():
         target_file = st.selectbox("Target Indicator", target_files)
 
         # --- Soft Indicators from All Markets ---
-        with st.expander("📎 Select Soft Indicators from All Markets", expanded=True):
+        with st.expander("Select Soft Indicators from Below Markets", expanded=True):
             all_soft_options = {}
             for m in countries:
                 folder = os.path.join(".", m)
@@ -47,11 +47,11 @@ def configure_sidebar():
             soft_files = [item for sublist in all_soft_options.values() for item in sublist]
 
         # --- Time Filter ---
-        with st.expander("🕒 Time Range Filter", expanded=True):
+        with st.expander("Time Range Filter", expanded=True):
             year_range = st.slider("Select Year Range", 2005, 2025, (2010, 2020))
 
         # --- Advanced Options ---
-        with st.expander("🛠Advanced Options", expanded=False):
+        with st.expander("Advanced Options", expanded=False):
             normalize = st.checkbox("Normalize Indicators", value=True)
             lag_period = st.slider("Lag Period", 0, 12, 3)
 
