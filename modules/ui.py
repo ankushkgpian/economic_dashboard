@@ -14,7 +14,7 @@ import streamlit as st
 def configure_sidebar():
     import os
     with st.sidebar:
-        st.subheader("Configuration Panel")
+        st.header("Configuration Panel")
 
         # --- Target Market Selection ---
         with st.expander("Target Market", expanded=True):
