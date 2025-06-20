@@ -14,28 +14,40 @@ def run_forecast_model(df_target, df_softs, config):
         st.warning("Select at least one soft indicator.")
         return
 
-    # Merge data
+    # Merge target
     df = df_target[["Reference Period", "Actual"]].rename(columns={"Actual": "Target"})
-    soft_names = [f.replace(".csv", "") for f in config["soft_files"]]
-    for name, soft_df in zip(soft_names, df_softs):
-        df = df.merge(soft_df[["Reference Period", "Actual"]].rename(columns={"Actual": name}), on="Reference Period", how="inner")
 
+    # Use soft indicator names from config
+    soft_names = [src["file"].replace(".csv", "") for src in config["soft_sources"]]
+
+    # Merge all soft indicators
+    for name, soft_df in zip(soft_names, df_softs):
+        df = df.merge(
+            soft_df[["Reference Period", "Actual"]].rename(columns={"Actual": name}),
+            on="Reference Period", how="inner"
+        )
+
+    # Sort and create lag & diff features
     df.sort_values("Reference Period", inplace=True)
     for col in soft_names:
-        df[f"{col}_lag1"] = df[col].shift(1)
+        df[f"{col}_lag1"] = df[col].shift(config["lag_period"])
         df[f"{col}_diff1"] = df[col].diff()
 
     df.dropna(inplace=True)
 
+    # Features and Target
     X = df.drop(columns=["Reference Period", "Target"])
     y = df["Target"]
 
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+    # Optional normalization
+    if config.get("normalize", True):
+        scaler = StandardScaler()
+        X = scaler.fit_transform(X)
 
+    # Model
     model = RandomForestRegressor(n_estimators=100, random_state=42)
-    model.fit(X_scaled, y)
-    y_pred = model.predict(X_scaled)
+    model.fit(X, y)
+    y_pred = model.predict(X)
 
     # --- Metrics ---
     st.markdown("#### Model Metrics")
@@ -46,7 +58,7 @@ def run_forecast_model(df_target, df_softs, config):
                   round(np.sqrt(mean_squared_error(y, y_pred)), 4)]
     }))
 
-    # --- Plot Actual vs Predicted ---
+    # --- Actual vs Predicted ---
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df["Reference Period"], y=y, name="Actual"))
     fig.add_trace(go.Scatter(x=df["Reference Period"], y=y_pred, name="Predicted"))
@@ -54,12 +66,13 @@ def run_forecast_model(df_target, df_softs, config):
 
     # --- Feature Importances ---
     importances_df = pd.DataFrame({
-        "Feature": X.columns,
+        "Feature": X.columns if isinstance(X, pd.DataFrame) else [f"X{i}" for i in range(X.shape[1])],
         "Importance": model.feature_importances_
     }).sort_values("Importance", ascending=False).head(10)
 
     fig = px.bar(importances_df, x="Importance", y="Feature", orientation="h", title="Top 10 Feature Importances")
     st.plotly_chart(fig, use_container_width=True)
+
 
 def compute_correlation_matrix(df_target, df_softs):
     if not df_softs:
