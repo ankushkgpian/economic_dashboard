@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-from modules.modeling import run_forecast_model, compute_correlation_matrix
+from modules.modeling import run_forecast_model, compute_correlation_matrix, compute_lead_lag_correlation
 def clean_title(name):
     return name.replace(".csv", "").replace("_", " ").title()
 
