@@ -11,24 +11,22 @@ def load_csv(filepath):
     return df
 
 def load_data(config):
-    # Load target indicator
-    target_path = os.path.join(".", config["target_country"], config["target_file"])
-    df_target = load_csv(target_path)
-
-    # Load soft indicators
+    import os
+    df_target = load_csv(os.path.join(config["folder"], config["target_file"]))
+    
+    # Load soft indicators using full relative paths (e.g., US/file.csv)
     df_softs = []
-    for src in config["soft_sources"]:
-        file_path = os.path.join(".", src["country"], src["file"])
-        df = load_csv(file_path)
-        df["Source"] = f'{src["country"]}/{src["file"].replace(".csv", "")}'
-        df_softs.append(df)
+    for path in config["soft_files"]:
+        folder, file = path.split("/")
+        df_softs.append(load_csv(os.path.join(folder, file)))
 
-    # Apply year range filter
+    # Time filter
     start_year, end_year = config["year_range"]
     df_target = df_target[df_target["Reference Period"].dt.year.between(start_year, end_year)]
     for i in range(len(df_softs)):
         df_softs[i] = df_softs[i][df_softs[i]["Reference Period"].dt.year.between(start_year, end_year)]
 
     return df_target, df_softs
+
 
 
