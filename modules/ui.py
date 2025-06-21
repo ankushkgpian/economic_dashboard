@@ -195,8 +195,3 @@ def download_options(df, filename):
     with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False)
     st.download_button("Download Excel", buffer.getvalue(), file_name=filename.replace(".csv", ".xlsx"))
-
-st.markdown("### 🔍 Ask Perplexity AI")
-st.markdown("""
-<iframe src="https://www.perplexity.ai" width="100%" height="600" style="border:none;"></iframe>
-""", unsafe_allow_html=True)
