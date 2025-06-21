@@ -11,6 +11,14 @@ def clean_title(name):
 import os
 import streamlit as st
 
+from modules.chatbot import ask_chatbot
+
+user_input = st.text_input("Ask the economic bot:")
+if user_input:
+    reply = ask_chatbot(user_input)
+    st.markdown(f"**Bot:** {reply}")
+
+
 def configure_sidebar():
     import os
     with st.sidebar:
