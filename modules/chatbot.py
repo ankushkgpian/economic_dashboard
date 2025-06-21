@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 
 def ask_chatbot(prompt):
-    api_key = st.secrets.get("OPENAI_API_KEY")
+    api_key = st.secrets.get("openai_api_key")
 
     if not api_key:
         return "Missing OpenAI API key."
