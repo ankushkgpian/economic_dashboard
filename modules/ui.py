@@ -11,7 +11,6 @@ from modules.modeling import (
     compute_correlation_matrix,
     compute_lead_lag_correlation
 )
-from modules.chatbot import ask_chatbot
 
 
 def clean_title(name):
@@ -76,7 +75,7 @@ def display_tabs(config, df_target, df_softs):
 
     tabs = st.tabs([
         "Time Series", "Seasonality", "Forecasting",
-        "Correlation Matrix", "Lead-Lag", "Chatbot 🤖"
+        "Correlation Matrix", "Lead-Lag"
     ])
 
     with tabs[0]:
@@ -113,12 +112,6 @@ def display_tabs(config, df_target, df_softs):
         lag_q = st.slider("Lag (quarters)", 0, 8, 3)
         compute_lead_lag_correlation(df1, df2, lag_quarters=lag_q)
 
-    with tabs[5]:
-        st.subheader("Ask the Economic Chatbot 🤖")
-        user_input = st.text_input("Ask your question here:")
-        if user_input:
-            reply = ask_chatbot(user_input)
-            st.markdown(f"**Bot:** {reply}")
 
     # --- Global Montserrat Style ---
     st.markdown("""
