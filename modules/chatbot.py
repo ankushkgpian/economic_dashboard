@@ -1,13 +1,12 @@
-# modules/chatbot.py
-from openai import OpenAI
-import os
+import openai
+import streamlit as st
 
 def ask_chatbot(prompt):
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = st.secrets.get("OPENAI_API_KEY")
     if not api_key:
         return "Missing OpenAI API key."
 
-    client = OpenAI(api_key=api_key)
+    client = openai.OpenAI(api_key=api_key)
 
     try:
         response = client.chat.completions.create(
